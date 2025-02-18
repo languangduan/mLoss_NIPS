@@ -1,0 +1,35 @@
+{
+    "MNIST": {
+        "top1": 0.9877
+    },
+    "DTD": {
+        "top1": 0.5824468085106383
+    },
+    "EuroSAT": {
+        "top1": 0.7694444444444445
+    },
+    "GTSRB": {
+        "top1": 0.7671417260490895
+    },
+    "SUN397": {
+        "top1": 0.6219024412670682
+    },
+    "SVHN": {
+        "top1": 0.8992393976644131
+    },
+    "rowwise_trimmed_layers": [
+        "model.visual.transformer.resblocks.0.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.1.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.2.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.3.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.4.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.5.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.6.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.7.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.8.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.9.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.10.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.11.mlp.c_fc.weight"
+    ],
+    "avg_accuracy": 0.7713124696559422
+}

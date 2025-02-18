@@ -1,0 +1,36 @@
+{
+    "MNIST": {
+        "top1": 0.988
+    },
+    "DTD": {
+        "top1": 0.5702127659574469
+    },
+    "EuroSAT": {
+        "top1": 0.7451851851851852
+    },
+    "GTSRB": {
+        "top1": 0.7707838479809976
+    },
+    "SUN397": {
+        "top1": 0.5961564985517908
+    },
+    "SVHN": {
+        "top1": 0.9008143822987092
+    },
+    "rowwise_trimmed_layers": [
+        "model.visual.transformer.resblocks.0.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.1.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.2.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.3.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.4.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.5.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.6.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.7.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.8.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.9.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.10.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.11.mlp.c_fc.weight"
+    ],
+    "avg_accuracy": 0.7618587799956883,
+    "random_seed": 42
+}

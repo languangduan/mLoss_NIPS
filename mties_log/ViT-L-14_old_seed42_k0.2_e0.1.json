@@ -1,0 +1,48 @@
+{
+    "MNIST": {
+        "top1": 0.9913
+    },
+    "DTD": {
+        "top1": 0.7143617021276596
+    },
+    "EuroSAT": {
+        "top1": 0.960925925925926
+    },
+    "GTSRB": {
+        "top1": 0.8825019794140935
+    },
+    "SUN397": {
+        "top1": 0.7813893614086709
+    },
+    "SVHN": {
+        "top1": 0.9177166564228642
+    },
+    "rowwise_trimmed_layers": [
+        "model.visual.transformer.resblocks.0.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.1.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.2.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.3.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.4.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.5.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.6.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.7.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.8.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.9.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.10.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.11.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.12.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.13.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.14.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.15.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.16.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.17.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.18.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.19.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.20.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.21.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.22.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.23.mlp.c_fc.weight"
+    ],
+    "avg_accuracy": 0.8746992708832023,
+    "random_seed": 42
+}

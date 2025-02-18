@@ -1,0 +1,38 @@
+[
+    {
+        "key": "model.visual.positional_embedding",
+        "task_1": "SUN397",
+        "task_2": "SVHN",
+        "cosine_similarity": -0.0005460074171423912
+    },
+    {
+        "key": "model.visual.positional_embedding",
+        "task_1": "EuroSAT",
+        "task_2": "GTSRB",
+        "cosine_similarity": -0.00935332290828228
+    },
+    {
+        "key": "model.visual.positional_embedding",
+        "task_1": "EuroSAT",
+        "task_2": "SVHN",
+        "cosine_similarity": -0.027196886017918587
+    },
+    {
+        "key": "model.visual.positional_embedding",
+        "task_1": "MNIST",
+        "task_2": "GTSRB",
+        "cosine_similarity": -0.028554443269968033
+    },
+    {
+        "key": "model.visual.transformer.resblocks.6.mlp.c_proj.weight",
+        "task_1": "DTD",
+        "task_2": "SVHN",
+        "cosine_similarity": -0.0011526071466505527
+    },
+    {
+        "key": "model.visual.transformer.resblocks.6.mlp.c_proj.weight",
+        "task_1": "MNIST",
+        "task_2": "DTD",
+        "cosine_similarity": -0.0012699529761448503
+    }
+]
