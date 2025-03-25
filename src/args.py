@@ -4,7 +4,13 @@ import argparse
 import torch
 
 def parse_arguments():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser() 
+    parser.add_argument(
+        "--device",
+        type=str,
+        default='cuda:1',
+        help="The gpu number.",
+    )
     parser.add_argument(
         "--data-location",
         type=str,
@@ -45,6 +51,11 @@ def parse_arguments():
         "--batch-size",
         type=int,
         default=128,
+    )
+    parser.add_argument(
+        "--sampling-size",
+        type=int,
+        default=1,
     )
     parser.add_argument(
         "--lr",
