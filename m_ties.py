@@ -25,6 +25,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+device = torch.device("cuda:1" if (torch.cuda.is_available() and torch.cuda.device_count() > 1) else "cuda:0" if torch.cuda.is_available() else "cpu")
+logger.info(f"Using device: {device}")
+
+
 ###############################################################################
 # 1. Utility: Build Unlabeled Data Combined
 ###############################################################################
