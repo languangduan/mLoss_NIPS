@@ -34,7 +34,7 @@ class LLFCAnalyzer:
         self.layer_input = None  # 存储目标层的输入张量
         self.layer_output = None  # 存储目标层的输出张量
         self.act = act  # 激活函数，用于处理层输出
-        self.device = device if device is not None else 'cuda:0'  # 设置计算设备，默认使用 'cuda:2'
+        self.device = device if device is not None else 'cuda:0'  # 设置计算设备，默认使用 'cuda:0'
         # self.register_hooks()  # (注释掉的代码，可能用于未来扩展)
 
     def register_hooks(self, model: nn.Module):

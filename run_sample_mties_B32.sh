@@ -17,12 +17,12 @@ K=0.2
 E=0.1
 SEED=42
 
-SAMPLING=8
+SAMPLING=4
 
 # Set the results JSON path
 RESULTS_DB="mties_sampling_log/${MODEL}_seed${SEED}_k${K}_e${E}_sam${SAMPLING}.json"
 
-DEVICE="cuda:2"
+DEVICE="cuda:3"
 # Optionally, set the number of workers (default is 4)
 NUM_WORKERS=4
 
