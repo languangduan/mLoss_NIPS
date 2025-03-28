@@ -13,7 +13,7 @@ from src.datasets.registry import get_dataset
 from src.datasets.common import maybe_dictionarize
 from src.task_vectors import TaskVector
 from src.eval import eval_single_dataset
-from llfcAnalyzer import LLFCAnalyzer
+from old_history_file.llfcAnalyzerOld import LLFCAnalyzer
 import PIL
 from PIL import Image
 
@@ -147,11 +147,12 @@ def m_ties_merging(
     # 1. Load the pretrained model
     logger.info(f"Loading pretrained model from '{pretrained_checkpoint}'")
     pretrained_model = torch.load(pretrained_checkpoint, map_location='cpu')
-    models = [pretrained_model]
+    merged_model = copy.deepcopy(pretrained_model)
+    models = [merged_model]
     for i in finetuned_checkpoints:
         models.append(torch.load(i,map_location = 'cpu'))
     pretrained_sd = pretrained_model.state_dict()
-    merged_model = copy.deepcopy(pretrained_model)
+    #merged_model = copy.deepcopy(pretrained_model)
     # 2. Create the list of task vectors
     all_task_vectors = []
     for ft_ckpt in finetuned_checkpoints:

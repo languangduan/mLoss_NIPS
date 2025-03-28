@@ -4,7 +4,7 @@
 MODEL="ViT-B-32"
 
 # 设置数据集列表，逗号分隔（包括 Cars 和 RESISC45）
-EVAL_DATASETS="MNIST,DTD,EuroSAT,GTSRB,SUN397,SVHN"
+EVAL_DATASETS="RESISC45,Cars,MNIST,DTD,EuroSAT,GTSRB,SUN397,SVHN"
 
 # 设置数据存放路径
 DATA_LOCATION="datasets"
@@ -12,10 +12,10 @@ DATA_LOCATION="datasets"
 # 设置检查点保存路径
 SAVE_PATH="checkpoints/${MODEL}"
 SEED=42
-K=0.8
+K=1.0
 LAYERWISE="False"
 # 设置结果保存路径（可选）
-RESULTS_DB="dare_log/${MODEL}_k${K}_seed${SEED}_${LAYERWISE}.json"
+RESULTS_DB="logs/dare_log/${MODEL}_k${K}_seed${SEED}_${LAYERWISE}.json"
 
 # 创建保存目录（如果不存在）
 mkdir -p "${SAVE_PATH}"

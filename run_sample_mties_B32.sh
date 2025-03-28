@@ -4,7 +4,7 @@
 MODEL="ViT-B-32"
 
 # Provide the dataset list as a single comma-separated string
-EVAL_DATASETS="MNIST,DTD,EuroSAT,GTSRB,SUN397,SVHN"
+EVAL_DATASETS="RESISC45,Cars,MNIST,DTD,EuroSAT,GTSRB,SUN397,SVHN"
 
 # Set data storage path
 DATA_LOCATION="datasets"

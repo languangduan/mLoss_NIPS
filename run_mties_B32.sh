@@ -4,7 +4,7 @@
 MODEL="ViT-B-32"
 
 # Provide the dataset list as a single comma-separated string
-EVAL_DATASETS="MNIST,DTD,EuroSAT,GTSRB,SUN397,SVHN"
+EVAL_DATASETS="RESISC45,Cars,MNIST,DTD,EuroSAT,GTSRB,SUN397,SVHN"
 
 # Set data storage path
 DATA_LOCATION="datasets"
@@ -13,12 +13,14 @@ DATA_LOCATION="datasets"
 SAVE_PATH="checkpoints/${MODEL}"
 
 
-K=0.4
+K=0.8
 E=0.1
 SEED=42
 
+SAMPLING=4
+DEVICE="cuda:2"
 # Set the results JSON path
-RESULTS_DB="mties_log/${MODEL}_seed${SEED}_k${K}_e${E}.json"
+RESULTS_DB="logs/mties_log/${MODEL}_seed${SEED}_k${K}_e${E}_sam${SAMPLING}.json"
 
 # Optionally, set the number of workers (default is 4)
 NUM_WORKERS=4
@@ -42,4 +44,6 @@ python m_ties.py \
     --wd 0.1 \
     --epochs 10 \
     --results-db "${RESULTS_DB}" \
-    --num-workers "${NUM_WORKERS}"
+    --num-workers "${NUM_WORKERS}" \
+    --device "${DEVICE}" \
+    --sampling-size "${SAMPLING}"

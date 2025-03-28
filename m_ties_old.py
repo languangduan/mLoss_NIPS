@@ -13,7 +13,7 @@ from src.datasets.registry import get_dataset
 from src.datasets.common import maybe_dictionarize
 from src.task_vectors import TaskVector
 from src.eval import eval_single_dataset
-from llfcAnalyzer import LLFCAnalyzer
+from old_history_file.llfcAnalyzerOld import LLFCAnalyzer
 import PIL
 from PIL import Image
 
@@ -126,7 +126,8 @@ def m_ties_merging(
     e=0.1,
     rowwise_target_layers=None,
     analyzer = LLFCAnalyzer(device = args.device),
-    scaling = 1.0
+    scaling = 1.0,
+    args = args
 ):
     """
     Modified TIES method that merges multiple task vectors layer by layer, trimming
@@ -151,7 +152,7 @@ def m_ties_merging(
     for i in finetuned_checkpoints:
         models.append(torch.load(i,map_location = 'cpu'))
     pretrained_sd = pretrained_model.state_dict()
-    
+    #merged_model = copy.deepcopy(pretrained_model)
     # 2. Create the list of task vectors
     all_task_vectors = []
     for ft_ckpt in finetuned_checkpoints:
@@ -187,7 +188,7 @@ def m_ties_merging(
 
             data_iter = iter(sample_dataloader)
             N = len(models)-1  # 使用的批次数量
-
+            N *=args.sampling_size
             # 初始化累积变量
             M_l_sum = None  # 确保形状与 M_l 的返回值相同
 
@@ -405,7 +406,6 @@ def main():
     # Set fixed random seeds for reproducibility
     # ------------------------------
     SEED = args.seed
-    device = args.device
     logger.info(f"Setting random seed to {SEED} for reproducibility.")
     random.seed(SEED)
     np.random.seed(SEED)

@@ -4,17 +4,17 @@
 MODEL="ViT-L-14"
 
 # 设置数据集列表，逗号分隔（包括 Cars 和 RESISC45）
-EVAL_DATASETS="MNIST,DTD,EuroSAT,GTSRB,SUN397,SVHN"
+EVAL_DATASETS="RESISC45,Cars,MNIST,DTD,EuroSAT,GTSRB,SUN397,SVHN"
 
 # 设置数据存放路径
 DATA_LOCATION="datasets"
 
 # 设置检查点保存路径
 SAVE_PATH="checkpoints/${MODEL}"
-SCALING=1.5
+SCALING=1.0
 SEED=42
 # 设置结果保存路径（可选）
-RESULTS_DB="arith_log/${MODEL}_scaling${SCALING}_seed${SEED}.json"
+RESULTS_DB="logs_l14/arith_log/${MODEL}_scaling${SCALING}_seed${SEED}.json"
 
 # 创建保存目录（如果不存在）
 mkdir -p "${SAVE_PATH}"

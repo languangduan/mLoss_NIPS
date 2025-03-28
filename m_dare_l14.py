@@ -13,7 +13,7 @@ from src.datasets.registry import get_dataset
 from src.datasets.common import maybe_dictionarize
 from src.task_vectors import TaskVector
 from src.eval import eval_single_dataset
-from llfcAnalyzer import LLFCAnalyzer
+from old_history_file.llfcAnalyzerOld import LLFCAnalyzer
 import PIL
 from PIL import Image
 
