@@ -1,0 +1,90 @@
+{
+    "RESISC45": {
+        "top1": 0.8822222222222222
+    },
+    "Cars": {
+        "top1": 0.8347220494963313
+    },
+    "MNIST": {
+        "top1": 0.9891
+    },
+    "DTD": {
+        "top1": 0.6675531914893617
+    },
+    "EuroSAT": {
+        "top1": 0.9487037037037037
+    },
+    "GTSRB": {
+        "top1": 0.8346793349168646
+    },
+    "SUN397": {
+        "top1": 0.7555514688979817
+    },
+    "SVHN": {
+        "top1": 0.8865242778119238
+    },
+    "rowwise_trimmed_layers": [
+        "model.visual.transformer.resblocks.0.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.1.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.2.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.3.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.4.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.5.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.6.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.7.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.8.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.9.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.10.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.11.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.12.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.13.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.14.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.15.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.16.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.17.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.18.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.19.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.20.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.21.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.22.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.23.mlp.c_fc.weight"
+    ],
+    "avg_accuracy": 0.8498820310672985,
+    "random_seed": 42,
+    "runtime_seconds": 8786.000812292099,
+    "hyperparameters": {
+        "device": "cuda:2",
+        "data_location": "datasets",
+        "eval_datasets": [
+            "RESISC45",
+            "Cars",
+            "MNIST",
+            "DTD",
+            "EuroSAT",
+            "GTSRB",
+            "SUN397",
+            "SVHN"
+        ],
+        "train_dataset": null,
+        "exp_name": null,
+        "results_db": "logs_l14/mties_log/ViT-L-14_seed42_k0.8_e0.1.json",
+        "model": "ViT-L-14",
+        "batch_size": 128,
+        "sampling_size": 1,
+        "lr": 0.001,
+        "wd": 0.1,
+        "ls": 0.0,
+        "warmup_length": 500,
+        "epochs": 10,
+        "load": null,
+        "save": "checkpoints/ViT-L-14",
+        "cache_dir": null,
+        "openclip_cachedir": "/gscratch/efml/gamaga/.cache/open_clip",
+        "num_workers": 4,
+        "k": 0.8,
+        "e": 0.1,
+        "layerwise": null,
+        "seed": 42,
+        "scaling": null
+    }
+}

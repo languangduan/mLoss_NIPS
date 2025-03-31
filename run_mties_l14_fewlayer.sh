@@ -13,13 +13,14 @@ DATA_LOCATION="datasets"
 SAVE_PATH="checkpoints/${MODEL}"
 
 
-K=0.8
+K=0.5
 E=0.1
 SEED=42
+
 SAMPLING=1
-DEVICE="cuda:2"
+DEVICE="cuda:1"
 # Set the results JSON path
-RESULTS_DB="logs_l14/mties_log/${MODEL}_seed${SEED}_k${K}_e${E}.json"
+RESULTS_DB="logs_l14/mties_fewlayer_log/${MODEL}_seed${SEED}_k${K}_e${E}_sam${SAMPLING}.json"
 
 # Optionally, set the number of workers (default is 4)
 NUM_WORKERS=4
@@ -30,7 +31,7 @@ mkdir -p "${SAVE_PATH}"
 mkdir -p "$(dirname "${RESULTS_DB}")"
 
 # Run m_ties.py with the new --num-workers argument
-python m_ties.py \
+python m_ties_fewlayer.py \
     --model "${MODEL}" \
     --eval-datasets "${EVAL_DATASETS}" \
     --save "${SAVE_PATH}" \

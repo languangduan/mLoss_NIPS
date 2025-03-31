@@ -280,8 +280,10 @@ def main():
         min_samples=100
     )
     logger.info("Unlabeled data loader built successfully.")
-
-    rowwise_target_layers = [f"model.visual.transformer.resblocks.{i}.mlp.c_fc.weight" for i in range(24)]
+    if model_name == "ViT-B-32":
+        rowwise_target_layers = [f"model.visual.transformer.resblocks.{i}.mlp.c_fc.weight" for i in [8,9,10]]
+    elif model_name == "ViT-L-14":
+        rowwise_target_layers = [f"model.visual.transformer.resblocks.{i}.mlp.c_fc.weight" for i in range(24)]
     merged_vector, detected_layers = m_ties_merging(
         pretrained_checkpoint=pretrained_checkpoint,
         finetuned_checkpoints=finetuned_ckpts,
