@@ -18,9 +18,9 @@ E=0.1
 SEED=42
 
 SAMPLING=1
-DEVICE="cuda:1"
+DEVICE="cuda:2"
 # Set the results JSON path
-RESULTS_DB="logs_l14/mties_fewlayer_log/${MODEL}_seed${SEED}_k${K}_e${E}_sam${SAMPLING}.json"
+RESULTS_DB="logs_l14/mties_fewlayer_log/${MODEL}_seed${SEED}_k${K}_e${E}_sam${SAMPLING}_202122.json"
 
 # Optionally, set the number of workers (default is 4)
 NUM_WORKERS=4
@@ -31,7 +31,7 @@ mkdir -p "${SAVE_PATH}"
 mkdir -p "$(dirname "${RESULTS_DB}")"
 
 # Run m_ties.py with the new --num-workers argument
-python m_ties_fewlayer.py \
+python m_ties_l14_fewlayer.py \
     --model "${MODEL}" \
     --eval-datasets "${EVAL_DATASETS}" \
     --save "${SAVE_PATH}" \

@@ -17,7 +17,7 @@ K=0.8
 E=0.1
 SEED=42
 
-SAMPLING=4
+SAMPLING=1
 DEVICE="cuda:2"
 # Set the results JSON path
 RESULTS_DB="logs/mties_log/${MODEL}_seed${SEED}_k${K}_e${E}_sam${SAMPLING}.json"

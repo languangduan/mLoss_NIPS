@@ -281,7 +281,7 @@ def main():
     )
     logger.info("Unlabeled data loader built successfully.")
 
-    rowwise_target_layers = [f"model.visual.transformer.resblocks.{i}.mlp.c_fc.weight" for i in [0,20,21,22]]
+    rowwise_target_layers = [f"model.visual.transformer.resblocks.{i}.mlp.c_fc.weight" for i in [20,21,22]]
     merged_vector, detected_layers = m_ties_merging(
         pretrained_checkpoint=pretrained_checkpoint,
         finetuned_checkpoints=finetuned_ckpts,

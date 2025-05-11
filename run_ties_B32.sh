@@ -12,8 +12,8 @@ DATA_LOCATION="datasets"
 # 设置检查点保存路径
 SAVE_PATH="checkpoints/${MODEL}"
 SEED=42
-K=0.999
-LAYERWISE="False"
+K=0.2
+LAYERWISE="True"
 # 设置结果保存路径（可选）
 RESULTS_DB="logs/ties_log/${MODEL}_k${K}_seed${SEED}_${LAYERWISE}.json"
 

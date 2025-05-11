@@ -129,13 +129,14 @@ def parse_arguments():
     )
     parser.add_argument(
         "--layerwise",
-        type=bool,
+        type=str,
         default=None,
         help="whether use layerwise merging method"
     )
     parser.add_argument(
         "--seed",
         type=int,
+        
         default=None,
         help="random seed"
     )

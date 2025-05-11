@@ -1,7 +1,7 @@
 import json
 
 # JSON 文件名称
-json_filename = "ViT-L-14_seed42_k0.5_e0.1.json"
+json_filename = "ViT-B-32_seed42_k0.8_e0.1_08910.json"
 
 # 读取 JSON 数据
 with open(json_filename, "r") as f:

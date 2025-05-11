@@ -26,7 +26,7 @@ else:
     avg_val = sum(valid_vals) / len(valid_vals) if valid_vals else 0.0
 
 def fmt(val):
-    return f"{val:.2f}" if val is not None else ""
+    return f"{val:.3f}" if val is not None else ""
 
 # 格式化各数据集的数值
 row_entries = [fmt(values[ds]) for ds in datasets]
