@@ -25,6 +25,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+args = parse_arguments()
+device = torch.device(args.device if torch.cuda.is_available() else "cpu")
+logger.info(f"Using device: {device}")
+
 ###############################################################################
 # 1. Utility: Build Unlabeled Data Combined
 ###############################################################################
@@ -121,7 +125,7 @@ def m_ties_merging(
     k=0.2,
     e=0.1,
     rowwise_target_layers=None,
-    analyzer = LLFCAnalyzer(),
+    analyzer = LLFCAnalyzer(device = args.device),
     scaling = 1.0
 ):
     """

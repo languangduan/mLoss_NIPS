@@ -200,6 +200,48 @@ svhn_template = [
     lambda c: f'a photo of the number: "{c}".',
 ]
 
+stl10_template = [
+    lambda c: f'a photo of a {c}.',
+    lambda c: f'a photo of the {c}.',
+    lambda c: f'a clear photo of a {c}.',
+    lambda c: f'a color photo of a {c}.',
+    lambda c: f'a color photo of the {c}.',
+    lambda c: f'a photo of a small {c}.',
+    lambda c: f'a photo of a typical {c}.',
+    lambda c: f'a photo of a common {c}.',
+]
+
+fashionmnist_template = [
+    lambda c: f'a photo of a {c}, a type of clothing.',
+    lambda c: f'a photo of the {c}, a type of apparel.',
+    lambda c: f'a photo of a {c}, a piece of clothing.',
+    lambda c: f'a simple photo of a {c}.',
+    lambda c: f'a photo of a single {c}.',
+]
+
+flowers102_template = [
+    lambda c: f'a photo of a {c} flower.',
+    lambda c: f'a photo of the {c} flower.',
+    lambda c: f'a close-up photo of a {c} flower.',
+    lambda c: f'a bright photo of a {c} flower.',
+    lambda c: f'a photo of a small {c} flower.',
+    lambda c: f'a photo of a colorful {c} flower.',
+    lambda c: f'a close-up photo of the {c} flower.',
+    lambda c: f'a photo of a {c} in bloom.',
+    lambda c: f'a photo of a beautiful {c}.',
+    lambda c: f'a photo of a fresh {c}.',
+    lambda c: f'a photo of a wild {c}.',
+    lambda c: f'a photo of a {c} plant.',
+    lambda c: f'a photo showing the petals of a {c}.',
+    lambda c: f'a macro photo of a {c} flower.',
+    lambda c: f'a photo of a blooming {c}.',
+    lambda c: f'a photo of a single {c} flower.',
+    lambda c: f'a photo of a bouquet with {c}.',
+    lambda c: f'a photo of a garden with {c}.',
+    lambda c: f'a photo of the flowering {c}.',
+    lambda c: f'a detailed photo of a {c}.',
+]
+
 
 dataset_to_template = {
     'Cars': cars_template,
@@ -215,7 +257,10 @@ dataset_to_template = {
     'STL10': stl10_template,
     'SUN397': sun397_template,
     'SVHN': svhn_template,
+    'Flowers102': flowers102_template,
+    'FashionMNIST': fashionmnist_template,
 }
+
 
 
 def get_templates(dataset_name):

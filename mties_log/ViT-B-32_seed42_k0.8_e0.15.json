@@ -1,0 +1,78 @@
+{
+    "RESISC45": {
+        "top1": 0.726031746031746
+    },
+    "Cars": {
+        "top1": 0.6080089541101853
+    },
+    "MNIST": {
+        "top1": 0.9764
+    },
+    "DTD": {
+        "top1": 0.5478723404255319
+    },
+    "EuroSAT": {
+        "top1": 0.8183333333333334
+    },
+    "GTSRB": {
+        "top1": 0.7260490894695171
+    },
+    "SUN397": {
+        "top1": 0.6207530688244218
+    },
+    "SVHN": {
+        "top1": 0.8321681007990166
+    },
+    "rowwise_trimmed_layers": [
+        "model.visual.transformer.resblocks.0.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.1.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.2.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.3.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.4.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.5.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.6.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.7.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.8.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.9.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.10.mlp.c_fc.weight",
+        "model.visual.transformer.resblocks.11.mlp.c_fc.weight"
+    ],
+    "avg_accuracy": 0.7319520791242189,
+    "random_seed": 42,
+    "runtime_seconds": 218.1689751148224,
+    "hyperparameters": {
+        "device": "cuda:2",
+        "data_location": "datasets",
+        "eval_datasets": [
+            "RESISC45",
+            "Cars",
+            "MNIST",
+            "DTD",
+            "EuroSAT",
+            "GTSRB",
+            "SUN397",
+            "SVHN"
+        ],
+        "train_dataset": null,
+        "exp_name": null,
+        "results_db": "mties_log/ViT-B-32_seed42_k0.8_e0.15.json",
+        "model": "ViT-B-32",
+        "batch_size": 128,
+        "sampling_size": 1,
+        "lr": 0.001,
+        "wd": 0.1,
+        "ls": 0.0,
+        "warmup_length": 500,
+        "epochs": 10,
+        "load": null,
+        "save": "checkpoints/ViT-B-32",
+        "cache_dir": null,
+        "openclip_cachedir": "/gscratch/efml/gamaga/.cache/open_clip",
+        "num_workers": 4,
+        "k": 0.8,
+        "e": 0.15,
+        "layerwise": null,
+        "seed": 42,
+        "scaling": null
+    }
+}

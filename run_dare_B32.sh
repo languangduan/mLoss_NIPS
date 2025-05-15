@@ -12,7 +12,7 @@ DATA_LOCATION="datasets"
 # 设置检查点保存路径
 SAVE_PATH="checkpoints/${MODEL}"
 SEED=42
-K=0.1
+K=0.7
 LAYERWISE="False"
 # 设置结果保存路径（可选）
 RESULTS_DB="logs/dare_log/${MODEL}_k${K}_seed${SEED}_${LAYERWISE}.json"
