@@ -91,7 +91,7 @@ def build_unlabeled_data_combined(dataset_names, args, proportion=0.01, max_samp
         batch_size=args.batch_size,
         shuffle=True,
         num_workers=args.num_workers,
-        collate_fn=custom_collate_fn  # 添加自定义 collate_fn
+        collate_fn=custom_collate_fn 
     )
     logger.info("Unlabeled DataLoader created successfully.")
     return combined_loader
@@ -100,9 +100,9 @@ def build_unlabeled_data_combined(dataset_names, args, proportion=0.01, max_samp
 
 to_tensor = transforms.ToTensor()
 resize_and_to_tensor = transforms.Compose([
-    transforms.Resize((224, 224)),  # 调整大小
-    transforms.ToTensor(),        # 转换为张量
-    transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x)  # 如果是灰度图，扩展到 3 通道
+    transforms.Resize((224, 224)),  
+    transforms.ToTensor(),        
+    transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x)  
 ])
 
 def custom_collate_fn(batch):
@@ -181,34 +181,27 @@ def m_ties_merging(
 
 
             data_iter = iter(sample_dataloader)
-            N = len(models)-1  # 使用的批次数量
+            N = len(models)-1 
 
-            # 初始化累积变量
-            M_l_sum = None  # 确保形状与 M_l 的返回值相同
+            M_l_sum = None  
 
-            # 循环获取多个批次数据
             for _ in range(N):
                 try:
-                    batch = next(data_iter)  # 获取一个批次数据
+                    batch = next(data_iter) 
                 except StopIteration:
-                    # 如果 DataLoader 的数据不足 N 个批次，则重新初始化迭代器
                     data_iter = iter(sample_dataloader)
                     batch = next(data_iter)
 
                 inputs, labels = batch
                 weights = [1 / (len(models) - 1) for _ in range(len(models) - 1)]
                 layer_key = param_key[:-len('.weight')]
-
-                # 计算当前批次的 M_l
                 M_l = analyzer.compute_llfc_loss_by_row(inputs, models, weights, layer_key)
 
-                # 累积 M_l
                 if M_l_sum == None:
                     M_l_sum = M_l.clone()
                 else:
                     M_l_sum += M_l
 
-            # 计算最终的 M_l 均值
             M_l = M_l_sum / N
 
             trimmed_tvs = rowwise_robust_trim_task_vector(param_tvs, k, e, sample_dataloader,M_l)
@@ -276,33 +269,18 @@ def dare_trim_vector(tensor, k):
     return trimmed
 
 def robust_scale_losses(row_losses: torch.Tensor) -> torch.Tensor:
-    """使用鲁棒缩放标准化损失值 (输入和输出均为 Tensor)
-
-    Args:
-        row_losses (torch.Tensor): 原始损失值张量
-
-    Returns:
-        torch.Tensor: 标准化后的损失值张量
-    """
-    # 计算中位数
     median = torch.median(row_losses)
-    
-    # 计算四分位数
     q75 = torch.quantile(row_losses, 0.75)
     q25 = torch.quantile(row_losses, 0.25)
-    iqr = q75 - q25  # 四分位距
+    iqr = q75 - q25  
 
     if iqr == 0:
-        # 如果 IQR 为 0，则所有值相同，返回全 0 张量
         return torch.zeros_like(row_losses)
 
-    # 鲁棒缩放
     scaled = (row_losses - median) / iqr
 
-    # 可选：限制缩放后的值范围
     #scaled = torch.clamp(scaled, -3, 3)
 
-    # 归一化到 [0, 1]
     min_val = scaled.min()
     max_val = scaled.max()
     normalized = (scaled - min_val) / (max_val - min_val)
@@ -310,26 +288,21 @@ def robust_scale_losses(row_losses: torch.Tensor) -> torch.Tensor:
     return normalized
 
 def rank_scale(row_losses: torch.Tensor) -> torch.Tensor:
-    """基于排序的缩放 (支持 GPU 和 CPU)"""
-    device = row_losses.device  # 获取输入张量所在的设备
+    device = row_losses.device  
 
-    # 排序并生成排名
     sorted_indices = row_losses.argsort()
-    ranks = torch.zeros_like(sorted_indices, dtype=torch.float32, device=device)  # 确保 ranks 在相同设备上
-    ranks[sorted_indices] = torch.arange(len(row_losses), dtype=torch.float32, device=device)  # 将 ranks 移动到正确设备
+    ranks = torch.zeros_like(sorted_indices, dtype=torch.float32, device=device)  
+    ranks[sorted_indices] = torch.arange(len(row_losses), dtype=torch.float32, device=device)  
 
-    # 归一化到 [0, 1]
     normalized = ranks / (len(row_losses) - 1)
     return normalized
 
 
 
 def log_scale(row_losses: torch.Tensor, eps: float = 1e-6) -> torch.Tensor:
-    """对数缩放"""
-    row_losses = row_losses + eps  # 防止 log(0)
+    row_losses = row_losses + eps 
     scaled = torch.log(row_losses)
 
-    # 归一化到 [0, 1]
     min_val = scaled.min()
     max_val = scaled.max()
     normalized = (scaled - min_val) / (max_val - min_val)
