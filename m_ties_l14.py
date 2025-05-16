@@ -79,7 +79,7 @@ def build_unlabeled_data_combined(dataset_names, args, proportion=0.01, max_samp
 
 to_tensor = transforms.ToTensor()
 resize_and_to_tensor = transforms.Compose([
-    transforms.Resize((224, 224)),  # 调整大小
+    transforms.Resize((224, 224)), 
     transforms.ToTensor(),        
     transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x)
 ])
@@ -254,7 +254,6 @@ def main():
     logger.info("Starting m_TIES script.")
     args = parse_arguments()
 
-    # 固定随机种子，确保可重复性
     SEED = args.seed
     logger.info(f"Setting random seed to {SEED} for reproducibility.")
     random.seed(SEED)
