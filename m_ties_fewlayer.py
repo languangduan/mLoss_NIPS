@@ -14,7 +14,7 @@ from src.datasets.registry import get_dataset
 from src.datasets.common import maybe_dictionarize
 from src.task_vectors import TaskVector
 from src.eval import eval_single_dataset
-from old_history_file.llfcAnalyzerOld import LLFCAnalyzer  # 建议替换为优化后的版本
+from old_history_file.llfcAnalyzerOld import LLFCAnalyzer  
 import PIL
 from PIL import Image
 import itertools
@@ -79,7 +79,7 @@ def build_unlabeled_data_combined(dataset_names, args, proportion=0.01, max_samp
 
 to_tensor = transforms.ToTensor()
 resize_and_to_tensor = transforms.Compose([
-    transforms.Resize((224, 224)),  # 调整大小
+    transforms.Resize((224, 224)),  
     transforms.ToTensor(),        
     transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x)
 ])
@@ -125,7 +125,6 @@ def m_ties_merging(
     merged_vector = {}
     detected_layers = []
 
-    # 预先计算固定的 weights 列表，用于 row-wise 部分（除基准模型外的模型）
     fixed_weights = [1.0 / (len(models) - 1)] * (len(models) - 1)
     data_iter = itertools.cycle(sample_dataloader)
 
@@ -251,7 +250,7 @@ def ties_elect_and_merge(trimmed_tensors):
 # 4. Full Demo Script "main"
 ###############################################################################
 def main():
-    start_time = time.time()  # 记录开始时间
+    start_time = time.time() 
     logger.info("Starting m_TIES script.")
     args = parse_arguments()
 
@@ -268,7 +267,7 @@ def main():
     logger.info("Random seeds set successfully.")
 
     model_name = args.model
-    dataset_names = args.eval_datasets  # args.eval_datasets 已经是列表
+    dataset_names = args.eval_datasets  
     pretrained_checkpoint = f'checkpoints/{model_name}/zeroshot.pt'
     finetuned_ckpts = [f'checkpoints/{model_name}/{ds}/finetuned.pt' for ds in dataset_names]
 
@@ -325,12 +324,10 @@ def main():
         logger.warning("No 'top1' keys found in evaluation results; cannot compute average accuracy.")
     evaluation_results["random_seed"] = SEED
 
-    # 记录运行时间
     end_time = time.time()
     runtime_seconds = end_time - start_time
     evaluation_results["runtime_seconds"] = runtime_seconds
 
-    # 记录超参数（将 args 转为字典）
     evaluation_results["hyperparameters"] = vars(args)
 
     logger.info(f"Random seed used: {SEED}")
