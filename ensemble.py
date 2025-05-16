@@ -15,75 +15,62 @@ from src.eval import eval_single_dataset
 from src.datasets.registry import get_dataset
 from src.datasets.common import maybe_dictionarize
 
-# 配置日志
 logging.basicConfig(
-    level=logging.INFO,  # 或 logging.DEBUG
+    level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[logging.StreamHandler()]
 )
 logger = logging.getLogger(__name__)
 
-# 定义伪模型类：用于将多个检查点模型隐藏层输出进行平均
 import torch.nn as nn
-
 
 class PseudoEnsembleEncoder(nn.Module):
     def __init__(self, models, layer_name=None):
         """
-        初始化伪模型，保存多个检查点模型，并指定提取隐藏层的层名（可选）
+        Ensemble encoder that averages the hidden layer outputs of multiple models.
         Args:
-            models (list[nn.Module]): 加载好的多个检查点模型
-            layer_name (str, 可选): 指定提取隐藏层的名称，默认为 None，则取最后一层隐藏状态
+            models (list[nn.Module]): List of loaded checkpoint models.
+            layer_name (str, optional): Name of the hidden layer to extract. If None, use the last layer output.
         """
         super(PseudoEnsembleEncoder, self).__init__()
         self.models = models
         self.layer_name = layer_name
 
-        # 从第一个模型继承所有属性
         self.base_model = models[0]
-
         self.train_preprocess = models[0].train_preprocess
         self.val_preprocess = models[0].val_preprocess
-        # 将第一个模型的所有属性复制到当前模型
+        # Copy all non-private, non-callable, non-forward attributes from base model
         for attr_name in dir(self.base_model):
-            # 跳过私有属性、内置方法和forward方法
-            if not attr_name.startswith('_') and attr_name != 'forward' and not callable(
-                    getattr(self.base_model, attr_name)):
+            if not attr_name.startswith('_') and attr_name != 'forward' and not callable(getattr(self.base_model, attr_name)):
                 try:
                     setattr(self, attr_name, getattr(self.base_model, attr_name))
                 except AttributeError:
-                    pass  # 如果无法设置某些属性，跳过
+                    pass
 
-        # 设置所有模型为评估模式，避免计算梯度
         for model in self.models:
             model.eval()
 
     def forward(self, x):
         """
-        对输入 x 依次通过各个模型，提取隐藏层输出，并对所有输出进行平均
+        Pass input x through each model, extract hidden layer outputs, and average them.
         Args:
-            x (Tensor): 输入图像数据
+            x (Tensor): Input image data.
         Returns:
-            Tensor: 平均后的隐藏层表示
+            Tensor: Averaged hidden layer representation.
         """
         hidden_states = []
         for model in self.models:
             with torch.no_grad():
-                # 直接使用模型的前向传播
                 output = model(x)
                 hidden_states.append(output)
-
-        # 对各模型的输出沿新维度堆叠后求均值
         hidden_avg = torch.mean(torch.stack(hidden_states, dim=0), dim=0)
         return hidden_avg
 
-
-# 自定义 collate_fn，用于数据加载时处理图像
 to_tensor = transforms.ToTensor()
 resize_and_to_tensor = transforms.Compose([
-    transforms.Resize((224, 224)),  # 调整大小
-    transforms.ToTensor(),           # 转换为张量
-    transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x)  # 灰度图扩展到3通道
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x)
 ])
 
 def custom_collate_fn(batch):
@@ -98,9 +85,6 @@ def main():
     args = parse_arguments()
     args.seed = 42
 
-    # ------------------------------
-    # 固定随机种子，确保结果可重复
-    # ------------------------------
     SEED = args.seed
     logger.info(f"Setting random seed to {SEED} for reproducibility.")
     random.seed(SEED)
@@ -111,18 +95,13 @@ def main():
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-    # ------------------------------
-    # 加载多个检查点模型
-    # ------------------------------
     model_name = args.model
     dataset_names = args.eval_datasets
 
-    # 这里假设我们同时加载 zeroshot（预训练）和各数据集对应的 finetuned 检查点
     pretrained_checkpoint = f'checkpoints/{model_name}/zeroshot.pt'
     finetuned_ckpts = [f'checkpoints/{model_name}/{ds}/finetuned.pt' for ds in dataset_names]
 
     logger.info(f"Loading pretrained model from: {pretrained_checkpoint}")
-    # 加载预训练模型，并移动到指定设备
     pretrained_model = torch.load(pretrained_checkpoint, map_location=args.device)
     models = [pretrained_model]
 
@@ -131,20 +110,15 @@ def main():
         model = torch.load(ckpt, map_location=args.device)
         models.append(model)
 
-    # 构造伪模型，对所有模型隐藏层进行平均
     ensemble_encoder = PseudoEnsembleEncoder(models, layer_name=None)
     logger.info("Ensemble encoder constructed successfully.")
 
-    # ------------------------------
-    # 使用 ensemble_encoder 进行数据集评估
-    # ------------------------------
     evaluation_results = {}
     total_accuracy = 0.0
     num_datasets = 0
 
     for ds in dataset_names:
         logger.info(f"Evaluating on dataset '{ds}' using ensemble encoder.")
-        # 调用 eval_single_dataset，内部会将 image_encoder 与分类头组合构成 ImageClassifier
         result = eval_single_dataset(ensemble_encoder, ds, args)
         evaluation_results[ds] = result
 
@@ -154,7 +128,6 @@ def main():
 
         logger.info(f"Results for '{ds}': {result}")
 
-    # 计算平均准确率
     if num_datasets > 0:
         avg_acc = total_accuracy / num_datasets
         evaluation_results["avg_accuracy"] = avg_acc
@@ -164,7 +137,6 @@ def main():
 
     evaluation_results["random_seed"] = SEED
 
-    # 保存评估结果到 JSON 文件
     if args.results_db is not None:
         results_path = args.results_db
         dirname = os.path.dirname(results_path)
