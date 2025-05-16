@@ -13,12 +13,10 @@ class TaskVector():
             self.vector = vector
 
 
-        #self.vector输出model state dict
         else:
             assert pretrained_checkpoint is not None and finetuned_checkpoint is not None
             with torch.no_grad():
                 pretrained_state_dict = torch.load(pretrained_checkpoint).state_dict()
-                # 检查预训练模型的参数名称
                 #print("Pretrained model state dict keys:", list(pretrained_state_dict.keys()))
                 finetuned_state_dict = torch.load(finetuned_checkpoint).state_dict()
                 self.vector = {}
