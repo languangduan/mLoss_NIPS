@@ -14,7 +14,7 @@ from src.datasets.registry import get_dataset
 from src.datasets.common import maybe_dictionarize
 from src.task_vectors import TaskVector
 from src.eval import eval_single_dataset
-from old_history_file.llfcAnalyzerOld import LLFCAnalyzer  # 建议替换为优化后的版本
+from old_history_file.llfcAnalyzerOld import LLFCAnalyzer  
 import PIL
 from PIL import Image
 import itertools
@@ -125,7 +125,6 @@ def m_ties_merging(
     merged_vector = {}
     detected_layers = []
 
-    # 预先计算固定的 weights 列表，用于 row-wise 部分（除基准模型外的模型）
     fixed_weights = [1.0 / (len(models) - 1)] * (len(models) - 1)
     data_iter = itertools.cycle(sample_dataloader)
 
