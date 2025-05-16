@@ -41,7 +41,7 @@ def build_unlabeled_data_combined(dataset_names, args, proportion=0.01, max_samp
         logger.info(f"Loading dataset '{ds_name}' for unlabeled sampling.")
         dataset_obj = get_dataset(
             ds_name,
-            preprocess=None,  # 不使用预处理
+            preprocess=None, 
             location=args.data_location,
             batch_size=args.batch_size,
             num_workers=args.num_workers
@@ -79,7 +79,7 @@ def build_unlabeled_data_combined(dataset_names, args, proportion=0.01, max_samp
 
 to_tensor = transforms.ToTensor()
 resize_and_to_tensor = transforms.Compose([
-    transforms.Resize((224, 224)),  # 调整大小
+    transforms.Resize((224, 224)),  
     transforms.ToTensor(),        
     transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x)
 ])
