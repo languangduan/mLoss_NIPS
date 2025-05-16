@@ -1,10 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import math
 from typing import Dict, List
 
-# 自定义异常类
 class StopForwardException(Exception):
     def __init__(self, output):
         self.output = output
@@ -19,7 +17,7 @@ class LLFCAnalyzer:
         self.act = act
         self.device = device if device is not None else 'cuda:0'
         self._module_cache = {}
-        self._weight_cache = {}  # 新增缓存权重张量的字典
+        self._weight_cache = {}
 
     def _get_target_module(self, model: nn.Module, target_layer: str) -> nn.Module:
         cache_key = (id(model), target_layer)
@@ -95,16 +93,13 @@ class LLFCAnalyzer:
     @torch.no_grad()
     def compute_llfc_loss_by_row(self, sample_input, models: List[nn.Module], weights: List[float],
                                  layer_name: str, activation_type='gelu'):
-        """
-        计算多个模型在指定层的理论 LLFC 损失，按每个隐藏维度返回损失 (hidden_dim, )。
-        """
         base_model = models[0]
         layer_input = self.get_layer_input(base_model, layer_name, sample_input)
         layer_outputs = [self.feed_layer(model, layer_name, layer_input) for model in models[1:]]
         if len(weights) != len(layer_outputs):
             raise ValueError("The number of weights must match the number of layer outputs.")
         activation_params = {'approximate': 'none'} if activation_type == 'gelu' else {}
-        stacked_outputs = torch.stack(layer_outputs, dim=0)  # (num_models, batch, patch, hidden)
+        stacked_outputs = torch.stack(layer_outputs, dim=0)
         num_models, batch_size, patch_size, hidden_dim = stacked_outputs.shape
         flattened_outputs = stacked_outputs.view(num_models, -1, hidden_dim)
         weights_tensor = self._get_weights_tensor(weights, num_models, flattened_outputs.device)
@@ -120,10 +115,6 @@ class LLFCAnalyzer:
         dim_loss = squared_diff.mean(dim=0)
         return dim_loss
 
-    # 其他 compute_llfc_loss、compute_norm_llfc_loss 等函数同理，均可使用 _get_weights_tensor 缓存
-    # （此处未逐一展示，其改动类似）
-    
-    # 以下函数未修改：analyze_layer、analyze_layer_without_merge、analyze_layer_output、get_intermediate_output
     def analyze_layer(self, layer_name: str, models: List[nn.Module], weights: List[float],
                       sample_input: torch.Tensor) -> torch.Tensor:
         try:
@@ -137,7 +128,7 @@ class LLFCAnalyzer:
             raise
 
     def analyze_layer_without_merge(self, layer_name: str, models: List[nn.Module], weights: List[float],
-                                      sample_input: torch.Tensor, base_model: nn.Module) -> torch.Tensor:
+                                   sample_input: torch.Tensor, base_model: nn.Module) -> torch.Tensor:
         try:
             layer_outputs = [self.get_intermediate_output(model, layer_name, sample_input) for model in models]
             base_output = self.get_intermediate_output(base_model, layer_name, sample_input)
