@@ -108,7 +108,7 @@ resize_and_to_tensor = transforms.Compose([
 def custom_collate_fn(batch):
     inputs, labels = zip(*batch)
     inputs = [resize_and_to_tensor(img) if isinstance(img, Image.Image) else img for img in inputs]
-    inputs = torch.stack(inputs)  # 堆叠成张量
+    inputs = torch.stack(inputs)  
     labels = torch.tensor(labels)
     return inputs, labels
 ###############################################################################
