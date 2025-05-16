@@ -37,7 +37,6 @@ else:
 #args.save = f'checkpoints/{model}'
 pretrained_checkpoint = f'checkpoints/{model}/zeroshot.pt'
 
-# 加载预训练模型的 state_dict
 pretrained_model = torch.load(pretrained_checkpoint)
 pretrained_state_dict = pretrained_model.state_dict()
 
@@ -129,22 +128,6 @@ def trim_task_vector(task_vector, k):
 
 
 
-
-
-#task_vector为字典的trim
-# def trim_task_vector(task_vector, k):
-#     """
-#     Trims the task vector by keeping only the top-k% values based on magnitude for each key.
-#     """
-#     trimmed_vector = {}
-#     for key, tensor in task_vector.items():
-#         # 计算每个张量的绝对值
-#         magnitude = tensor.abs()
-#         # 根据百分比计算阈值
-#         threshold = torch.quantile(magnitude, 1 - k)
-#         # 保留大于或等于阈值的值，其余置为0
-#         trimmed_vector[key] = torch.where(magnitude >= threshold, tensor, torch.zeros_like(tensor))
-#     return trimmed_vector
 
 
 def elect_sign_vector(task_vectors):
