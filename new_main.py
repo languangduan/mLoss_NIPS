@@ -87,22 +87,19 @@ def combine_task_vectors_with_layer_split(task_vectors, weights, lambda_coef, pr
 
         num_vectors = len(vector_list)
 
-        # 1. 计算每对向量的余弦相似度
+
         cos_sim_list = []
         for i in range(num_vectors):
             for j in range(i + 1, num_vectors):
                 cos_sim = cosine_similarity(vector_list[i], vector_list[j])
                 cos_sim_list.append((cos_sim, i, j))
 
-        # 2. 根据余弦相似度从大到小排序
         cos_sim_list.sort(reverse=True, key=lambda x: x[0])
         #print('cos',cos_sim_list)
 
-        # 3. 根据排序顺序进行正交投影
         for cos_sim, i, j in cos_sim_list:
-            if cos_sim < 0:  # 余弦相似度小于 0 时进行正交投影
+            if cos_sim < 0:  
                 vector_list[j] = orthogonal_projection(vector_list[j], vector_list[i])
-                # 记录投影日志
                 projection_log.append({
                     'key': key,
                     'task_1': datasets[i],
