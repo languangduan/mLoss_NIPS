@@ -98,9 +98,9 @@ def build_unlabeled_data_combined(dataset_names, args, proportion=0.01, max_samp
 
 to_tensor = transforms.ToTensor()
 resize_and_to_tensor = transforms.Compose([
-    transforms.Resize((224, 224)),  # 调整大小
-    transforms.ToTensor(),         # 转换为张量
-    transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x)  # 如果是灰度图，扩展到 3 通道
+    transforms.Resize((224, 224)),  
+    transforms.ToTensor(),         
+    transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x)  
 ])
 
 def custom_collate_fn(batch):
@@ -248,15 +248,13 @@ def robust_scale_losses(row_losses: torch.Tensor) -> torch.Tensor:
     return normalized
 
 def rank_scale(row_losses: torch.Tensor) -> torch.Tensor:
-    """基于排序的缩放 (支持 GPU 和 CPU)"""
-    device = row_losses.device  # 获取输入张量所在的设备
+    device = row_losses.device 
 
-    # 排序并生成排名
+
     sorted_indices = row_losses.argsort()
-    ranks = torch.zeros_like(sorted_indices, dtype=torch.float32, device=device)  # 确保 ranks 在相同设备上
-    ranks[sorted_indices] = torch.arange(len(row_losses), dtype=torch.float32, device=device)  # 将 ranks 移动到正确设备
+    ranks = torch.zeros_like(sorted_indices, dtype=torch.float32, device=device) 
+    ranks[sorted_indices] = torch.arange(len(row_losses), dtype=torch.float32, device=device)  
 
-    # 归一化到 [0, 1]
     normalized = ranks / (len(row_losses) - 1)
     return normalized
 
