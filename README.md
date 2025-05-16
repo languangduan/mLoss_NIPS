@@ -40,6 +40,9 @@ Before running experiments, you need to download the pre-trained and fine-tuned 
 The checkpoints include CLIP models (ViT-B/32, ViT-B/16, and ViT-L/14) fine-tuned on eight downstream tasks: Stanford Cars, DTD, EuroSAT, GTSRB, MNIST, RESISC45, SUN397, and SVHN.
 
 #### Build Classification Heads
+Note:
+
+Most datasets will be automatically downloaded during the first run. However, RESISC45 and Stanford Cars datasets require manual download from Kaggle due to usage restrictions. Please download these datasets from Kaggle and place them in the appropriate directory before running related experiments.
 
 For new datasets, you need to generate classification heads:
 
