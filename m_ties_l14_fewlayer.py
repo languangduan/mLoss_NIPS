@@ -41,7 +41,7 @@ def build_unlabeled_data_combined(dataset_names, args, proportion=0.01, max_samp
         logger.info(f"Loading dataset '{ds_name}' for unlabeled sampling.")
         dataset_obj = get_dataset(
             ds_name,
-            preprocess=None,  # 不使用预处理
+            preprocess=None, 
             location=args.data_location,
             batch_size=args.batch_size,
             num_workers=args.num_workers
@@ -79,7 +79,7 @@ def build_unlabeled_data_combined(dataset_names, args, proportion=0.01, max_samp
 
 to_tensor = transforms.ToTensor()
 resize_and_to_tensor = transforms.Compose([
-    transforms.Resize((224, 224)),  # 调整大小
+    transforms.Resize((224, 224)),  
     transforms.ToTensor(),        
     transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x)
 ])
@@ -251,11 +251,10 @@ def ties_elect_and_merge(trimmed_tensors):
 # 4. Full Demo Script "main"
 ###############################################################################
 def main():
-    start_time = time.time()  # 记录开始时间
+    start_time = time.time()  
     logger.info("Starting m_TIES script.")
     args = parse_arguments()
 
-    # 固定随机种子，确保可重复性
     SEED = args.seed
     logger.info(f"Setting random seed to {SEED} for reproducibility.")
     random.seed(SEED)
@@ -268,7 +267,7 @@ def main():
     logger.info("Random seeds set successfully.")
 
     model_name = args.model
-    dataset_names = args.eval_datasets  # args.eval_datasets 已经是列表
+    dataset_names = args.eval_datasets 
     pretrained_checkpoint = f'checkpoints/{model_name}/zeroshot.pt'
     finetuned_ckpts = [f'checkpoints/{model_name}/{ds}/finetuned.pt' for ds in dataset_names]
 
@@ -323,12 +322,10 @@ def main():
         logger.warning("No 'top1' keys found in evaluation results; cannot compute average accuracy.")
     evaluation_results["random_seed"] = SEED
 
-    # 记录运行时间
     end_time = time.time()
     runtime_seconds = end_time - start_time
     evaluation_results["runtime_seconds"] = runtime_seconds
 
-    # 记录超参数（将 args 转为字典）
     evaluation_results["hyperparameters"] = vars(args)
 
     logger.info(f"Random seed used: {SEED}")
