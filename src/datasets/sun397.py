@@ -4,21 +4,17 @@ import torchvision.datasets as datasets
 
 class SUN397:
     def __init__(self, preprocess, location='~/data', batch_size=32, num_workers=16):
-        # 加载完整数据集
         full_dataset = datasets.SUN397(
             root=location,
             download=True,
             transform=preprocess
         )
 
-        # 定义训练集和测试集的划分比例
         train_size = int(0.8 * len(full_dataset))
         test_size = len(full_dataset) - train_size
 
-        # 使用 random_split 进行划分
         self.train_dataset, self.test_dataset = torch.utils.data.random_split(full_dataset, [train_size, test_size])
 
-        # 创建 DataLoader
         self.train_loader = torch.utils.data.DataLoader(
             self.train_dataset,
             batch_size=batch_size,
