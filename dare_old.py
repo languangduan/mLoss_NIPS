@@ -33,7 +33,6 @@ if torch.cuda.is_available():
 #args.save = f'checkpoints/{model}'
 pretrained_checkpoint = f'checkpoints/{model}/zeroshot.pt'
 
-# 加载预训练模型的 state_dict
 pretrained_model = torch.load(pretrained_checkpoint)
 pretrained_state_dict = pretrained_model.state_dict()
 
