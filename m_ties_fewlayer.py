@@ -41,7 +41,7 @@ def build_unlabeled_data_combined(dataset_names, args, proportion=0.01, max_samp
         logger.info(f"Loading dataset '{ds_name}' for unlabeled sampling.")
         dataset_obj = get_dataset(
             ds_name,
-            preprocess=None,  # 不使用预处理
+            preprocess=None,  
             location=args.data_location,
             batch_size=args.batch_size,
             num_workers=args.num_workers
@@ -254,7 +254,6 @@ def main():
     logger.info("Starting m_TIES script.")
     args = parse_arguments()
 
-    # 固定随机种子，确保可重复性
     SEED = args.seed
     logger.info(f"Setting random seed to {SEED} for reproducibility.")
     random.seed(SEED)
