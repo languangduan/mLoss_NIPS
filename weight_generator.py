@@ -21,7 +21,7 @@ args.save = f'checkpoints/{model}'
 pretrained_checkpoint = f'checkpoints/{model}/zeroshot.pt'
 
 
-# 定义元模型（Meta-model）
+# Define Meta-model
 class MetaModel(nn.Module):
     def __init__(self, input_dim, output_dim):
         super(MetaModel, self).__init__()
@@ -31,46 +31,46 @@ class MetaModel(nn.Module):
         return self.fc(x)
 
 
-# 训练元模型
+# Train the meta-model
 def train_meta_model(task_vectors, similarities, meta_model, optimizer, criterion):
     meta_model.train()
 
-    # 计算任务相似度的输入（可能是两个向量的拼接或者其他处理方法）
-    input_data = torch.tensor(similarities, dtype=torch.float32)  # 任务相似度
-    target_weights = torch.tensor(task_vectors, dtype=torch.float32)  # 每个客户端的真实权重
+    # Compute the input for task similarity (could be concatenation of two vectors or other methods)
+    input_data = torch.tensor(similarities, dtype=torch.float32)  # Task similarities
+    target_weights = torch.tensor(task_vectors, dtype=torch.float32)  # True weights for each client
 
     optimizer.zero_grad()
 
-    # 元模型前向传播
+    # Meta-model forward pass
     output_weights = meta_model(input_data)
 
-    # 计算损失
+    # Compute loss
     loss = criterion(output_weights, target_weights)
 
-    # 反向传播
+    # Backward pass
     loss.backward()
     optimizer.step()
 
     return loss
 
 
-# 模型融合方法
+# Model merging method
 def model_merging(task_vectors, meta_model, similarities):
     meta_model.eval()
 
-    # 生成的权重
+    # Generated weights
     generated_weights = meta_model(torch.tensor(similarities, dtype=torch.float32))
 
-    # 将生成的权重应用到模型融合上
-    merged_model = torch.zeros_like(task_vectors[0])  # 初始化一个空的模型
+    # Apply generated weights to model merging
+    merged_model = torch.zeros_like(task_vectors[0])  # Initialize an empty model
     total_weight = 0
 
-    # 基于权重进行融合
+    # Merge based on weights
     for i, weight in enumerate(generated_weights):
         merged_model += task_vectors[i] * weight
         total_weight += weight
 
-    # 归一化模型
+    # Normalize the model
     merged_model /= total_weight
 
     return merged_model
@@ -83,23 +83,23 @@ task_vectors = [
 ]
 
 similarities = [[torch.cosine_similarity(v1, v2, dim=0).item() for v2 in task_vectors] for v1 in
-                task_vectors]  # 计算任务向量之间的相似度
+                task_vectors]  # Calculate similarities between task vectors
 
-# 初始化元模型
-input_dim = len(task_vectors)  # 输入维度为任务向量的数量
-output_dim = 1  # 输出维度为每个客户端的权重
+# Initialize meta-model
+input_dim = len(task_vectors)  # Input dimension is the number of task vectors
+output_dim = 1  # Output dimension is the weight for each client
 meta_model = MetaModel(input_dim, output_dim)
 
-# 优化器和损失函数
+# Optimizer and loss function
 optimizer = optim.Adam(meta_model.parameters(), lr=0.001)
 criterion = nn.MSELoss()
 
-# 训练元模型
+# Train the meta-model
 for epoch in range(1000):
     loss = train_meta_model(task_vectors, similarities, meta_model, optimizer, criterion)
     if epoch % 100 == 0:
         print(f"Epoch {epoch}, Loss: {loss.item()}")
 
-# 使用训练好的元模型进行模型融合
+# Use the trained meta-model for model merging
 merged_model = model_merging(task_vectors, meta_model, similarities)
 print("Merged Model:", merged_model)
