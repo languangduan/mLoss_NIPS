@@ -1,28 +1,28 @@
 #!/bin/bash
 
-# 设置模型名称
+# Set model name
 MODEL="ViT-L-14"
 
-# 设置数据集列表，逗号分隔（包括 Cars 和 RESISC45）
+# Set evaluation dataset list, separated by commas (including Cars and RESISC45)
 EVAL_DATASETS="RESISC45,Cars,MNIST,DTD,EuroSAT,GTSRB,SUN397,SVHN"
 
-# 设置数据存放路径
+# Set data storage path
 DATA_LOCATION="datasets"
 
-# 设置检查点保存路径
+# Set checkpoint save path
 SAVE_PATH="checkpoints/${MODEL}"
 SEED=42
 K=0.7
 LAYERWISE="False"
 DEVICE="cuda:2"
-# 设置结果保存路径（可选）
+# Set result save path (optional)
 RESULTS_DB="logs_l14/dare_log/${MODEL}_k${K}_seed${SEED}_${LAYERWISE}.json"
 
-# 创建保存目录（如果不存在）
+# Create save directory if it does not exist
 mkdir -p "${SAVE_PATH}"
 mkdir -p "$(dirname "${RESULTS_DB}")"
 
-# 运行 dare.py
+# Run dare.py
 python dare.py \
     --model "${MODEL}" \
     --eval-datasets "${EVAL_DATASETS}" \
