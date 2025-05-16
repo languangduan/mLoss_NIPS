@@ -3,7 +3,6 @@ import inspect
 import random
 import torch
 import copy
-
 import os
 from torch.utils.data.dataset import random_split
 from torchvision import datasets
@@ -22,15 +21,11 @@ from src.datasets.stl10 import STL10
 from src.datasets.svhn import SVHN
 from src.datasets.sun397 import SUN397
 
-# registry = {
-#     name: obj for name, obj in inspect.getmembers(sys.modules[__name__], inspect.isclass)
-# }
-
 import sys
 import torch
 from torch.utils.data import DataLoader, random_split
 
-# 假设你已经有 TV_DATASETS 字典
+# Dictionary for torchvision datasets
 TV_DATASETS = {
     'Flowers102':   (datasets.Flowers102, 20, True),
     'Caltech101':   (datasets.Caltech101, 10, True),
@@ -41,13 +36,12 @@ TV_DATASETS = {
     'CIFAR100':     (datasets.CIFAR100, 8, False),
 }
 
-
-# 哪些数据集有官方split
+# Datasets with official splits
 SPLIT_DATASETS = {
     'Flowers102': ['train', 'val', 'test'],
     'Food101': ['train', 'test'],
     'Caltech101': ['train', 'test'],
-    # 你可以继续补充
+    # Add more as needed
 }
 
 flowers102_classnames = [
@@ -79,7 +73,7 @@ flowers102_classnames = [
 
 prj_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 data_location = os.path.join(prj_root, "datasets")
-# 1. 定义通用封装类
+
 class TorchvisionDatasetWrapper:
     def __init__(self, dataset_cls, preprocess, location=data_location,
                  batch_size=32, num_workers=16, train_split=0.8, seed=0, has_official_split=False, **kwargs):
@@ -87,18 +81,17 @@ class TorchvisionDatasetWrapper:
         self.val_dataset = None
         self.test_dataset = None
 
-        # 1. 有官方split的数据集
+        # 1. Datasets with official split
         if has_official_split:
-            # Flowers102需要特殊处理
+            # Flowers102 needs special handling
             if dataset_cls is datasets.Flowers102:
                 self.train_dataset = dataset_cls(root=location, split='train', download=False, transform=preprocess, **kwargs)
                 self.val_dataset   = dataset_cls(root=location, split='test', download=False, transform=preprocess, **kwargs)
                 self.test_dataset  = dataset_cls(root=location, split='val', download=False, transform=preprocess, **kwargs)
                 self.classnames = flowers102_classnames
             else:
-                # 尝试加载train/val/test
+                # Try to load train/val/test
                 self.train_dataset = dataset_cls(root=location, split='train', download=False, transform=preprocess, **kwargs)
-                # Caltech101没有val split，这里用test作为val
                 try:
                     self.val_dataset   = dataset_cls(root=location, split='val', download=False, transform=preprocess, **kwargs)
                 except:
@@ -108,7 +101,6 @@ class TorchvisionDatasetWrapper:
                 except:
                     self.test_dataset = None
 
-                # 处理类别名
                 idx_to_class = getattr(self.train_dataset, 'classes', None)
                 if idx_to_class is not None:
                     self.classnames = list(idx_to_class)
@@ -118,30 +110,24 @@ class TorchvisionDatasetWrapper:
                 else:
                     self.classnames = None
 
-            # DataLoader
             self.train_loader = torch.utils.data.DataLoader(self.train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
-            # val_loader
             if self.val_dataset is not None:
                 self.val_loader = torch.utils.data.DataLoader(self.val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
             else:
                 self.val_loader = None
 
-            # test_loader 修正逻辑：如果 test split 没 label或 test_dataset 为 None，则 fallback 用 val_loader
-            # Flowers102 test split 没 label，Caltech101 没有 val split
+            # If test split has no label or test_dataset is None, fallback to val_loader
             if self.test_dataset is not None and len(getattr(self.test_dataset, 'targets', [])) > 0:
                 self.test_loader = torch.utils.data.DataLoader(self.test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
             elif self.val_dataset is not None:
-                # fallback 用 val split 做 test
                 self.test_dataset = self.val_dataset
                 self.test_loader = self.val_loader
             else:
-                # fallback 用 train split 做 test（极端情况）
                 self.test_dataset = self.train_dataset
                 self.test_loader = torch.utils.data.DataLoader(self.train_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
 
-        # 2. 没有官方 split 的
+        # 2. Datasets without official split
         else:
-            # 兼容FashionMNIST等
             if hasattr(dataset_cls, 'train') and 'train' in inspect.signature(dataset_cls).parameters:
                 full_dataset = dataset_cls(root=location, train=True, download=False, transform=preprocess, **kwargs)
                 test_dataset = dataset_cls(root=location, train=False, download=False, transform=preprocess, **kwargs)
@@ -161,11 +147,9 @@ class TorchvisionDatasetWrapper:
             if self.test_dataset is not None:
                 self.test_loader = torch.utils.data.DataLoader(self.test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
             else:
-                # fallback 用 val split 做 test
                 self.test_dataset = self.val_dataset
                 self.test_loader = self.val_loader
 
-            # 类别名
             idx_to_class = getattr(full_dataset, 'classes', None)
             if idx_to_class is not None:
                 self.classnames = list(idx_to_class)
@@ -175,34 +159,24 @@ class TorchvisionDatasetWrapper:
             else:
                 self.classnames = None
 
-
-
-
-# 2. 动态注册
-import sys
-
-
+# Dynamic registration
 def register_tv_datasets(TV_DATASETS):
     current_module = sys.modules[__name__]
     for name, (dataset_cls, default_epoch, has_official_split) in TV_DATASETS.items():
-        # 创建一个工厂函数来避免闭包问题
-        def create_init(cls,  has_official_split):
+        def create_init(cls, has_official_split):
             def __init__(self, preprocess, location=data_location, batch_size=32, num_workers=16, **kwargs):
                 TorchvisionDatasetWrapper.__init__(
-                    self, cls, preprocess, location, batch_size, num_workers,has_official_split=has_official_split, **kwargs
+                    self, cls, preprocess, location, batch_size, num_workers, has_official_split=has_official_split, **kwargs
                 )
-
             return __init__
 
         wrapper_class = type(
             name,
             (TorchvisionDatasetWrapper,),
-            {'__init__': create_init(dataset_cls,  has_official_split)}
+            {'__init__': create_init(dataset_cls, has_official_split)}
         )
         setattr(current_module, name, wrapper_class)
 
-
-# 3. 在主程序入口调用
 register_tv_datasets(TV_DATASETS)
 
 def build_registry():
@@ -222,9 +196,7 @@ def check_registry():
         else:
             print(f"  {name}: {cls.__name__}")
 
-# 调用检查函数
 check_registry()
-
 
 class GenericDataset(object):
     def __init__(self):
@@ -233,7 +205,6 @@ class GenericDataset(object):
         self.test_dataset = None
         self.test_loader = None
         self.classnames = None
-
 
 def split_train_into_train_val(dataset, new_dataset_class_name, batch_size, num_workers, val_fraction, max_val_samples=None, seed=0):
     assert val_fraction > 0. and val_fraction < 1.
@@ -255,7 +226,6 @@ def split_train_into_train_val(dataset, new_dataset_class_name, batch_size, num_
     )
     if new_dataset_class_name == 'MNISTVal':
         assert trainset.indices[0] == 36044
-
 
     new_dataset = None
 
@@ -281,11 +251,9 @@ def split_train_into_train_val(dataset, new_dataset_class_name, batch_size, num_
 
     return new_dataset
 
-
 def get_dataset(dataset_name, preprocess, location, batch_size=128, num_workers=16, val_fraction=0.1, max_val_samples=5000):
     print(dataset_name)
     if dataset_name.endswith('Val'):
-        # Handle val splits
         if dataset_name in registry:
             dataset_class = registry[dataset_name]
         else:
