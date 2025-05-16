@@ -2,22 +2,19 @@ import torch
 from src.task_vectors import TaskVector
 from src.eval import eval_single_dataset
 from src.args import parse_arguments
-import torch.nn.functional as F
-from tqdm import tqdm
-import json
 import numpy as np
-import logging
 import random
+import logging
+import json
 
-# Config
-# datasets = ['MNIST', 'DTD', 'EuroSAT', 'GTSRB', 'SUN397', 'SVHN', 'Cars', 'RESISC45']
+# Argument parsing and config
 args = parse_arguments()
 model = args.model
-datasets = args.eval_datasets  # 假设这是一个列表
+datasets = args.eval_datasets
 K = args.k
 SEED = args.seed
 
-# Initialize logger
+# Logger setup
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 logger.info(f"Setting random seed to {SEED} for reproducibility.")
@@ -28,126 +25,86 @@ torch.manual_seed(SEED)
 if torch.cuda.is_available():
     torch.cuda.manual_seed_all(SEED)
 
-# 加载预训练模型的 state_dict
+# Load pretrained model
 pretrained_checkpoint = f'checkpoints/{model}/zeroshot.pt'
 logger.info(f"Loading pretrained model from: {pretrained_checkpoint}")
-# 在加载时指定 map_location=args.device
 pretrained_model = torch.load(pretrained_checkpoint, map_location=args.device)
 pretrained_state_dict = pretrained_model.state_dict()
 
 def random_trim_task_vector(task_vector, k, rescale=True):
     """
-    Trims the task vector by randomly keeping k proportion of values and setting the rest to zero.
-
-    Args:
-        task_vector (dict): A model state dict, where keys are parameter names and values are tensors.
-        k (float): Proportion of values to keep (0 < k <= 1).
-
-    Returns:
-        dict: A trimmed task vector with the same keys but randomly modified tensor values.
+    Randomly keep k proportion of each tensor's elements in the task vector, set others to zero.
+    Optionally rescale the kept values by 1/k.
     """
     trimmed_vector = {}
     for key, tensor in task_vector.items():
         if not isinstance(tensor, torch.Tensor):
             continue
-
-        # Generate a random mask with probability k to keep each element
-        mask = torch.bernoulli(torch.full(tensor.shape, k)).to(tensor.device)
-        # Apply the mask to keep k proportion of the elements
+        mask = torch.bernoulli(torch.full(tensor.shape, k, device=tensor.device))
         if not rescale:
             trimmed_vector[key] = tensor * mask
         else:
-            trimmed_vector[key] = tensor * mask * (1 / k)
+            trimmed_vector[key] = tensor * mask * (1.0 / k)
     return trimmed_vector
 
 def elect_sign_vector(task_vectors):
     """
-    Elects the aggregated sign vector by resolving disagreements across task vectors.
-
-    Args:
-        task_vectors (list[dict]): A list of model state dicts, where each dict contains parameter tensors.
-
-    Returns:
-        dict: A model state dict containing the elected sign for each parameter.
+    For each parameter, elect the sign (+1 or -1) by majority mass across task vectors.
     """
     elected_sign = {}
-    # Iterate over keys in the task vector
     for key in task_vectors[0].keys():
-        # Stack all task vector tensors for the current parameter
-        stacked_tensors = torch.stack([task_vector[key] for task_vector in task_vectors])  # Shape: (n, ...)
-        # Calculate positive and negative mass
+        stacked_tensors = torch.stack([tv[key] for tv in task_vectors])
         positive_mass = stacked_tensors.clamp(min=0).sum(dim=0)
         negative_mass = (-stacked_tensors).clamp(min=0).sum(dim=0)
-        # Elect the sign based on the greater mass
         elected_sign[key] = torch.where(positive_mass >= negative_mass, 1.0, -1.0)
     return elected_sign
 
 def disjoint_merge(task_vectors, elected_sign):
     """
-    Combines task vectors by keeping only the parameters whose signs match the elected sign.
-    Performs element-wise scaling based on the number of task vectors contributing to each element.
-
-    Args:
-        task_vectors (list[dict]): A list of trimmed model state dicts.
-        elected_sign (dict): A model state dict containing the elected sign for each parameter.
-
-    Returns:
-        dict: A merged model state dict with element-wise averaged contributions.
+    For each parameter, keep only the elements whose sign matches the elected sign.
+    Average the contributions for each element.
     """
     merged_vector = {}
     for key in task_vectors[0].keys():
         merged_tensor = torch.zeros_like(task_vectors[0][key])
         contribution_counts = torch.zeros_like(task_vectors[0][key], dtype=torch.float)
-        for task_vector in task_vectors:
-            match_mask = torch.sign(task_vector[key]) == elected_sign[key]
-            contributing_values = torch.where(match_mask, task_vector[key], torch.zeros_like(task_vector[key]))
-            merged_tensor += contributing_values
+        for tv in task_vectors:
+            match_mask = torch.sign(tv[key]) == elected_sign[key]
+            merged_tensor += torch.where(match_mask, tv[key], torch.zeros_like(tv[key]))
             contribution_counts += match_mask.float()
         contribution_counts = torch.where(contribution_counts == 0, torch.ones_like(contribution_counts), contribution_counts)
-        averaged_tensor = merged_tensor / contribution_counts
-        merged_vector[key] = averaged_tensor
+        merged_vector[key] = merged_tensor / contribution_counts
     return merged_vector
 
 def dare_merging(task_vectors, k):
     """
-    Executes the DARE-MERGING process using the three steps: Random Trim, Elect, and Disjoint Merge.
-
-    Args:
-        task_vectors (list[dict]): A list of model state dicts.
-        k (float): Proportion of values to keep in the trimming step.
-
-    Returns:
-        dict: A merged model state dict.
+    DARE-MERGING: random trim, elect sign, and disjoint merge.
     """
-    # Step 1: Trim (Randomly)
     trimmed_task_vectors = [random_trim_task_vector(tv, k, rescale=True) for tv in task_vectors]
-    # Step 2: Elect
     elected_sign = elect_sign_vector(trimmed_task_vectors)
-    # Step 3: Disjoint Merge
     merged_task_vector = disjoint_merge(trimmed_task_vectors, elected_sign)
     return merged_task_vector
 
-# Load Task Vectors (只使用 finetuned 检查点，不包含预训练模型)
+# Load task vectors (from finetuned checkpoints)
 task_vectors = [
     TaskVector(pretrained_checkpoint, f'checkpoints/{model}/{dataset}/finetuned.pt').vector
     for dataset in datasets
 ]
 
-# Perform TIES-MERGING (这里使用 dare_merging 进行合并)
-k = args.k  # Keep top k values
+# Perform DARE merging
+k = args.k
 merged_task_vector = dare_merging(task_vectors, k)
 
-# Add to Initial Parameters and Scale
+# Apply scaling and create merged model
 scaling_hyperparameter = 1.0
 final_parameters = {key: scaling_hyperparameter * merged_task_vector[key]
                     for key in merged_task_vector.keys()}
-
-# Apply to Model and Evaluate
 image_encoder = TaskVector(vector=final_parameters).apply_to(pretrained_checkpoint, scaling_coef=1)
 
+# Evaluate on each dataset
 evaluation_results = {}
 for dataset in datasets:
-    print(f"Evaluating on {dataset}...")
+    logger.info(f"Evaluating on {dataset}...")
     result = eval_single_dataset(image_encoder, dataset, args)
     evaluation_results[dataset] = result
 
@@ -158,5 +115,5 @@ evaluation_results['average_accuracy'] = average_accuracy
 with open(args.results_db, 'w') as f:
     json.dump(evaluation_results, f, indent=4)
 
-print(f"Average accuracy across datasets: {average_accuracy * 100:.2f}%")
-print("Evaluation results saved to:", args.results_db)
+logger.info(f"Average accuracy across datasets: {average_accuracy * 100:.2f}%")
+logger.info(f"Evaluation results saved to: {args.results_db}")
