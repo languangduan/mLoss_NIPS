@@ -17,7 +17,7 @@ This repository implements the M-loss framework, a novel evaluation metric that 
 
 ```bash
 # Clone the repository
-git clone https://github.com/anonymous/mloss.git
+git clone https://github.com/Anonymous/mLoss_NIPS.git
 cd mloss
 
 # Install dependencies
