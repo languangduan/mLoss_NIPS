@@ -14,7 +14,6 @@ from torchvision.datasets.vision import VisionDataset
 
 class Cars:
     def __init__(self, preprocess, location='~/data', batch_size=128, num_workers=16):
-        # 加载训练集
         self.train_dataset = datasets.StanfordCars(
             root=location,
             split='train',
@@ -22,7 +21,6 @@ class Cars:
             transform=preprocess
         )
 
-        # 创建训练集的 DataLoader
         self.train_loader = torch.utils.data.DataLoader(
             self.train_dataset,
             batch_size=batch_size,
@@ -30,7 +28,6 @@ class Cars:
             num_workers=num_workers
         )
 
-        # 加载测试集
         self.test_dataset = datasets.StanfordCars(
             root=location,
             split='test',
@@ -38,7 +35,6 @@ class Cars:
             transform=preprocess
         )
 
-        # 创建测试集的 DataLoader
         self.test_loader = torch.utils.data.DataLoader(
             self.test_dataset,
             batch_size=batch_size,
